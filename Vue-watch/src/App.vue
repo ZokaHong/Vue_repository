@@ -1,37 +1,55 @@
 <script setup>
-import { ref, computed } from 'vue';
-const num = ref(0.9565)
-const numFormat = computed(()=>{
-  console.log('change')
-  if(Number.isNaN(num.value*100)) return num
-  return `${num.value*100}%`
+import { ref, reactive, watch, watchEffect} from 'vue';
+
+const text = ref('')
+watch(text, (newData, oldData)=>{
+  console.log(newData,oldData)
 })
 
-const firstName = ref("John")
-const lastName = ref("Doe")
-const fullName = computed({
-  get(){
-    return `${firstName.value} ${lastName.value}`
+const object = reactive({
+  levels:{
+    text:''
   },
-  set(newName){
-    const [newFirstName, newLastName] = newName.split(' ')
-    firstName.value = newFirstName
-    lastName.value = newLastName
-  }
-
+  label:''
 })
+watch([()=> object.levels.text, ()=> object.label],(newData, oldData)=>{
+  console.log(newData,oldData)
+})
+
+watchEffect(()=>{
+  console.log(object.levels.text)
+})
+const stop = watchEffect(()=>{
+  console.log(object.label)
+  if(object.label === 'stop') stop()
+})
+
+
+const dynamicStyle = reactive({
+  color:'red',
+  fontSize:'16px'
+})
+watch(text,(newData)=>{
+if(newData.length%3===0){
+  dynamicStyle.color='blue'
+  dynamicStyle.fontSize='30px'
+}else{
+  dynamicStyle.color='red'
+  dynamicStyle.fontSize='16px'
+}
+})
+
+
 </script>
 
 <template>
-<h1>Computed 計算屬性</h1>
-<h3>computed</h3>
-<input type="number" v-model="num">
-<h3>{{ numFormat }}</h3>
+<h1>watch</h1>
+<input type="text" v-model="text" :style="dynamicStyle" placeholder="text">
+<input type="text" v-model="object.levels.text" placeholder="object.levels.text">
+<input type="text" v-model="object.label" placeholder="object.label">
+<br>
+<h1>watchEffect</h1>
 
-<h3>人名</h3>
-<input type="text" v-model="fullName">
-<p>{{ firstName }}</p>
-<p>{{ lastName }}</p>
 
 </template>
 
