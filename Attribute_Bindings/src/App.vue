@@ -15,7 +15,7 @@ function toggleColor() {
 </script>
 
 <template>
-  7<p>
+  <p>
     <span :title="message">
       Hover your mouse over me for a few seconds to see my dynamically bound title!
     </span>
