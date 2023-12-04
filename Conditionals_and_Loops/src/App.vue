@@ -1,37 +1,45 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+const list = ref([1, 2, 3])
 
-const message = ref('Hello World!')
-const isRed = ref(true)
-const color = ref('green')
-
-function toggleRed() {
-  isRed.value = !isRed.value
+const show = ref(true)
+const showhideHandler = () => {
+  show.value = !show.value
 }
 
-function toggleColor() {
-  color.value = color.value === 'green' ? 'blue' : 'green'
+const pushHandler = () => {
+  list.value.push(list.value.length + 1)
 }
+const popHandler = () => {
+  list.value.pop()
+}
+
+const isReverse = ref(false)
+
+const reversedList = computed(() => {
+  return isReverse.value ? list.value.slice().reverse() : list.value
+});
+
+const reverseHandler = () => {
+  isReverse.value = !isReverse.value
+}
+
+
+
 </script>
 
 <template>
   <p>
-    <span :title="message">
-      Hover your mouse over me for a few seconds to see my dynamically bound title!
-    </span>
+    <button @click="showhideHandler">show/hide</button>
+    <button @click="pushHandler">push</button>
+    <button @click="popHandler">pop</button>
+    <button @click="reverseHandler">reverse</button>
   </p>
-  <!-- 這裡的red是字串 用boolean來判斷是否使用這個class名稱 -->
-  <p :class="{ red: isRed }" @click="toggleRed">
-    This should be red... but click me to toggle it.
-  </p>
+  <ul v-if="show && list.length > 0">
+    <li v-for="value of reversedList">
+      {{ value }}
+    </li>
 
-  <p :style="{ color }" @click="toggleColor">
-    This should be green, and should toggle between green and blue on click.
-  </p>
+  </ul>
+  <p v-else>hidden</p>
 </template>
-
-<style>
-.red {
-  color: red;
-}
-</style>

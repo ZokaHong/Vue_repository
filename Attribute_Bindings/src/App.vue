@@ -21,7 +21,7 @@ function toggleColor() {
     </span>
   </p>
   <!-- 這裡的red是字串 用boolean來判斷是否使用這個class名稱 -->
-  <p :class="{ red: isRed }" @click="toggleRed">
+  <p :class="{ 'red': isRed }" @click="toggleRed">
     This should be red... but click me to toggle it.
   </p>
 
@@ -33,5 +33,6 @@ function toggleColor() {
 <style>
 .red {
   color: red;
+  font-size: 18px;
 }
 </style>
