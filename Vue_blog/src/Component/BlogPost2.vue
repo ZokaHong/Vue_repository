@@ -1,7 +1,30 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, watch, watchEffect } from 'vue';
 import axios from 'axios';
 const inputText = ref('');
+
+const dynamicStyle = reactive({
+    color: '#000',
+    fontSize: '16px'
+})
+// 監聽 inputText 字數 改變 {{inputText}} 顏色
+watch(inputText, (newdata) => {
+    if (newdata.length % 2 === 0) {
+        dynamicStyle.color = 'blue'
+    } else {
+        dynamicStyle.color = 'red'
+
+    }
+})
+// watchEffect(()=>{
+//     if (inputText.value.length % 2 === 0) {
+//         dynamicStyle.color = 'blue'
+//     } else {
+//         dynamicStyle.color = 'red'
+
+//     }
+// })
+
 
 const changeBg = (event) => {
     event.currentTarget.style.backgroundColor = '#85a5e1';
@@ -12,12 +35,12 @@ const restoreBg = (event) => {
 const getData = () => {
     const axiosResponse = document.querySelector('.axiosResponse')
     axios.get('http://localhost:3000/stus').then(response => {
-        // 解構函數 從result{}中獲取data
+        // 解構函數 從 result{} 中獲取 data
         const { data } = response;
         console.log(data);
-        // 取得最新輸入的id
+        // 取得最新輸入的 id
         const lastItemId = data.length;
-        //[]中要取得最新資料 lastItemId-1
+        // [] 中要取得最新資料 lastItemId-1
         axiosResponse.innerHTML = `<table><th style="color:#9935d7;">取得最新資料:</th><td>${response.data[lastItemId - 1].name}</td></table>`;
     }).catch(err => {
         console.log(err);
@@ -26,7 +49,7 @@ const getData = () => {
 
 const postData = () => {
     const axiosResponse = document.querySelector('.axiosResponse')
-    // post第二個參數來傳遞 inputText是ref() 要用.value取值  
+    // post 第二個參數來傳遞 inputText 是 ref() 要用 .value 取值  
     axios.post('http://localhost:3000/stus', { name: inputText.value }).then(response => {
         const { data } = response;
         console.log(data);
@@ -44,7 +67,7 @@ const deleteData = () => {
             const lastDataId = response.data.length;
             console.log(lastDataId)
             axios.delete(`http://localhost:3000/stus/${lastDataId}`).then(response => {
-                //被刪除的資料是物件[Object Object] 要用.name或.id來取得對應的值
+                //被刪除的資料是物件 [Object Object] 要用 .name 或 .id 來取得對應的值
                 axiosResponse.innerHTML = `<table><th style="color:#e44228;">刪除成功 被刪除的資料:</th><td>${deletedData.name}</td></table>`;
             }).catch(err => {
                 console.log('刪除失敗');
@@ -65,11 +88,11 @@ const deleteData = () => {
     <div class="body">
 
         <div class="inputText">
-            <h3>請輸入資料</h3>
-            <input type="text" v-model="inputText">
-            <br />
-            <h3>您輸入的資料:</h3>
-            <span>{{ inputText }}</span>
+            <input type="text" v-model="inputText" style="background-color: aliceblue; color: black;" placeholder="請在此處輸入資料">
+            <div class="outputText">
+                <h3>您輸入的資料:</h3>
+                <span :style="dynamicStyle">{{ inputText }}</span>
+            </div>
         </div>
 
         <div class="nav">
@@ -121,6 +144,16 @@ const deleteData = () => {
     width: 100vh;
     min-height: 20vh;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.inputText input,
+h3,
+span {
+    width: 30vh;
+    height: 3vh;
 }
 
 .nav {
@@ -194,10 +227,11 @@ ul {
     transform: translateX(-100%);
     transition: 0.5s;
 }
-.slidebox:hover .caption{
+
+.slidebox:hover .caption {
     transform: translateX(0);
 }
-.slidebox:hover img{
+
+.slidebox:hover img {
     transform: translateX(100%);
-}
-</style>
+}</style>

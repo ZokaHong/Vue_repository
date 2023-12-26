@@ -62,7 +62,7 @@
   transition: .5s;
 }
 
-/* hover圖片放大 陰影 */
+/* hover 圖片放大 陰影 */
 .images:hover img {
   box-shadow: 0 0 25px #f0a777;
   transform: scale(1.05);
