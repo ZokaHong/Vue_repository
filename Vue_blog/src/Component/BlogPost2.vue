@@ -1,14 +1,15 @@
 <script setup>
 import { ref, reactive, watch, watchEffect } from 'vue';
 import axios from 'axios';
-const inputText = ref('');
+const inputName = ref('');
+const inputType = ref('')
 
 const dynamicStyle = reactive({
     color: '#000',
     fontSize: '16px'
 })
-// 監聽 inputText 字數 改變 {{inputText}} 顏色
-watch(inputText, (newdata) => {
+// 監聽 inputName 字數 改變 {{inputName}} 顏色
+watch(inputName, (newdata) => {
     if (newdata.length % 2 === 0) {
         dynamicStyle.color = 'blue'
     } else {
@@ -17,7 +18,7 @@ watch(inputText, (newdata) => {
     }
 })
 // watchEffect(()=>{
-//     if (inputText.value.length % 2 === 0) {
+//     if (inputName.value.length % 2 === 0) {
 //         dynamicStyle.color = 'blue'
 //     } else {
 //         dynamicStyle.color = 'red'
@@ -26,8 +27,10 @@ watch(inputText, (newdata) => {
 // })
 
 
+
+
 const changeBg = (event) => {
-    event.currentTarget.style.backgroundColor = '#85a5e1';
+    event.currentTarget.style.backgroundColor = 'rgba(248,199,145,0.8)';
 }
 const restoreBg = (event) => {
     event.currentTarget.style.backgroundColor = '';
@@ -35,25 +38,25 @@ const restoreBg = (event) => {
 const getData = () => {
     const axiosResponse = document.querySelector('.axiosResponse')
     axios.get('http://localhost:3000/stus').then(response => {
-        // 解構函數 從 result{} 中獲取 data
+        // 解構函數 從 response{} 中獲取 data === response.data
         const { data } = response;
         console.log(data);
         // 取得最新輸入的 id
         const lastItemId = data.length;
         // [] 中要取得最新資料 lastItemId-1
-        axiosResponse.innerHTML = `<table><th style="color:#9935d7;">取得最新資料:</th><td>${response.data[lastItemId - 1].name}</td></table>`;
+        axiosResponse.innerHTML = `<table><tr><th>取得最新資料</th></tr> <tr><th>名稱</th><td>${response.data[lastItemId - 1].name}</td></tr> <tr><th>類別</th><td>${response.data[lastItemId - 1].type}</td></tr></table>`;
     }).catch(err => {
         console.log(err);
     })
 }
 
 const postData = () => {
-    const axiosResponse = document.querySelector('.axiosResponse')
-    // post 第二個參數來傳遞 inputText 是 ref() 要用 .value 取值  
-    axios.post('http://localhost:3000/stus', { name: inputText.value }).then(response => {
+    const axiosResponse = document.querySelector('.axiosResponse');
+    // post 第二個參數來傳遞 inputName 是 ref() 要用 .value 取值  
+    axios.post('http://localhost:3000/stus', { name: inputName.value, type: inputType.value }).then(response => {
         const { data } = response;
         console.log(data);
-        axiosResponse.innerHTML = `<table><th style="color:#3fbdac;">傳遞最新資料:</th><td>${data.name}</td></table>`;
+        axiosResponse.innerHTML = `<table><tr><th>傳遞最新資料</th></tr> <tr><th>品名</th><td>${data.name}</td></tr> <tr><th>類別</th><td>${data.type}</td></tr></table>`;
     }).catch(err => {
         console.log(err);
     })
@@ -63,12 +66,11 @@ const deleteData = () => {
         if (response.data.length > 0) {
             const deletedData = response.data[response.data.length - 1]
             console.log(deletedData);
-            const axiosResponse = document.querySelector('.axiosResponse')
+            const axiosResponse = document.querySelector('.axiosResponse');
             const lastDataId = response.data.length;
-            console.log(lastDataId)
             axios.delete(`http://localhost:3000/stus/${lastDataId}`).then(response => {
                 //被刪除的資料是物件 [Object Object] 要用 .name 或 .id 來取得對應的值
-                axiosResponse.innerHTML = `<table><th style="color:#e44228;">刪除成功 被刪除的資料:</th><td>${deletedData.name}</td></table>`;
+                axiosResponse.innerHTML = `<table><tr><th>被刪除的資料</th></tr> <tr><th>品名</th><td>${deletedData.name}</td></tr> <tr><th>類別</th><td>${deletedData.type}</td></tr></table>`;
             }).catch(err => {
                 console.log('刪除失敗');
             })
@@ -80,6 +82,80 @@ const deleteData = () => {
         console.error('獲取數據失敗', error);
     });
 }
+const putData = () => {
+    axios.get('http://localhost:3000/stus').then(response => {
+        if (response.data.length > 0) {
+            // 修改前最新資料
+            const modifiedData = response.data[response.data.length - 1]
+            const axiosResponse = document.querySelector('.axiosResponse');
+            const lastModifieId = response.data.length;
+            axios.put(`http://localhost:3000/stus/${lastModifieId}`, { name: inputName.value, type: inputType.value }).then(response => {
+                if (modifiedData.name === inputName.value && modifiedData.type === inputType.value) {
+                    console.log("未修改")
+                    axiosResponse.innerHTML = `<table><tr><th>未修改</th></tr></table>`
+                } else if (modifiedData.name !== inputName.value && modifiedData.type === inputType.value) {
+                    console.log("品名修改")
+                    axiosResponse.innerHTML = `<table><tr><th>品名修改</th></tr> <tr><th>修改前品名</th><td>${modifiedData.name}</td></tr> <tr><th>修改後品名</th><td>${inputName.value}</td></tr></table>`
+                } else if (modifiedData.name === inputName.value && modifiedData.type !== inputType.value) {
+                    console.log("類別修改")
+                    axiosResponse.innerHTML = `<table><tr><th>類別修改</th></tr> <tr><th>修改前類別</th><td>${modifiedData.type}</td></tr> <tr><th>修改後類別</th><td>${inputType.value}</td></tr></table>`
+                } else {
+                    console.log("品名類別修改")
+                    axiosResponse.innerHTML = `<table><tr><th>品名類別皆修改</th></tr> <tr><th>修改前品名</th><td>${modifiedData.name}</td></tr> <tr><th>修改後品名</th><td>${inputName.value}</td></tr> <tr><th>修改前類別</th><td>${modifiedData.type}</td></tr> <tr><th>修改後類別</th><td>${inputType.value}</td></tr></table>`
+                }
+            }).catch(err => {
+                console.log('修改失敗');
+            })
+
+
+        } else {
+            console.log('沒有數據可修改');
+        }
+    })
+}
+const patchData1 = () => {
+    axios.get('http://localhost:3000/stus').then(response => {
+        if (response.data.length > 0) {
+            const modifiedData = response.data[response.data.length - 1]
+            console.log(modifiedData);
+            const axiosResponse = document.querySelector('.axiosResponse');
+            const lastModifieId = response.data.length;
+
+            axios.patch(`http://localhost:3000/stus/${lastModifieId}`, { name: inputName.value }).then(response => {
+                axiosResponse.innerHTML = `<table><tr><th">修改成功</th></tr> <tr><th>被修改:</th><td>${modifiedData.name}</td></tr> <tr><th>修改成:</th><td>${inputName.value}</td></tr></table>`
+            }).catch(err => {
+                console.log('修改失敗');
+            })
+
+        } else {
+            console.log('沒有數據可修改');
+        }
+    })
+}
+const patchData2 = () => {
+    axios.get('http://localhost:3000/stus').then(response => {
+        if (response.data.length > 0) {
+            const modifiedData = response.data[response.data.length - 1]
+            console.log(modifiedData);
+            const axiosResponse = document.querySelector('.axiosResponse');
+            const lastModifieId = response.data.length;
+
+            axios.patch(`http://localhost:3000/stus/${lastModifieId}`, { type: inputType.value }).then(response => {
+                axiosResponse.innerHTML = `<table><tr><th">修改成功</th></tr> <tr><th>被修改:</th><td>${modifiedData.type}</td></tr> <tr><th>修改成:</th><td>${inputType.value}</td></tr></table>`
+            }).catch(err => {
+                console.log('修改失敗');
+            })
+
+        } else {
+            console.log('沒有數據可修改');
+        }
+    })
+}
+
+
+
+
+
 
 
 </script>
@@ -88,10 +164,22 @@ const deleteData = () => {
     <div class="body">
 
         <div class="inputText">
-            <input type="text" v-model="inputText" style="background-color: aliceblue; color: black;" placeholder="請在此處輸入資料">
-            <div class="outputText">
-                <h3>您輸入的資料:</h3>
-                <span :style="dynamicStyle">{{ inputText }}</span>
+            <div class="nameBox">
+                <input type="text" v-model="inputName" style="background-color: aliceblue; color: black;"
+                    placeholder="請輸入品名">
+                <div>
+                    <h3>品名</h3>
+                    <span :style="dynamicStyle">{{ inputName }}</span>
+                </div>
+
+            </div>
+            <div class="typeBox">
+                <input type="text" v-model="inputType" style="background-color: aliceblue; color: black;"
+                    placeholder="請輸入類別">
+                <div>
+                    <h3>類別</h3>
+                    <span :style="dynamicStyle">{{ inputType }}</span>
+                </div>
             </div>
         </div>
 
@@ -103,8 +191,13 @@ const deleteData = () => {
                         @click="postData">POST</a></li>
                 <li><a href="#" @click.prevent class="Gamma" @mouseover="changeBg" @mouseleave="restoreBg"
                         @click="deleteData">DELETE</a></li>
-                <li><a href="#" @click.prevent class="Delta" @mouseover="changeBg" @mouseleave="restoreBg">PUT</a></li>
-                <li><a href="#" @click.prevent class="Epslion" @mouseover="changeBg" @mouseleave="restoreBg">PATCH</a>
+                <li><a href="#" @click.prevent class="Delta" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="putData">PUT</a></li>
+                <li><a href="#" @click.prevent class="Epslion" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="patchData1">PATCH name</a>
+                </li>
+                <li><a href="#" @click.prevent class="Zeta" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="patchData2">PATCH Type</a>
                 </li>
             </ul>
         </div>
@@ -130,7 +223,7 @@ const deleteData = () => {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     width: 100vh;
     height: 95vh;
@@ -143,18 +236,37 @@ const deleteData = () => {
 .inputText {
     width: 100vh;
     min-height: 20vh;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.inputText .nameBox,
+.inputText .typeBox {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.inputText input,
-h3,
-span {
-    width: 30vh;
+.inputText .nameBox input,
+.inputText .typeBox input {
     height: 3vh;
 }
+
+.inputText .nameBox input,
+.inputText .typeBox input {
+    width: 25%
+}
+
+.inputText .nameBox div,
+.inputText .typeBox div {
+    width: 25%;
+}
+
 
 .nav {
     position: relative;
@@ -234,4 +346,5 @@ ul {
 
 .slidebox:hover img {
     transform: translateX(100%);
-}</style>
+}
+</style>

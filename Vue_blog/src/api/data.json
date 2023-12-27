@@ -1,16 +1,24 @@
 {
   "stus": [
     {
-      "id": 1,
-      "name": "data1"
+      "name": "雞蛋",
+      "type": "蛋豆乳製品",
+      "id": 1
     },
     {
-      "id": 2,
-      "name": "data2"
+      "name": "玉米",
+      "type": "蔬菜水果",
+      "id": 2
     },
     {
-      "id": 3,
-      "name": "data3"
+      "name": "豆漿",
+      "type": "蛋豆乳製品",
+      "id": 3
+    },
+    {
+      "name": "西瓜汁",
+      "type": "蔬菜水果",
+      "id": 4
     }
   ],
   "comments": [
