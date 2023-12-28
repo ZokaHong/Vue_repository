@@ -2,7 +2,8 @@
 import { ref, reactive, watch, watchEffect } from 'vue';
 import axios from 'axios';
 const inputName = ref('');
-const inputType = ref('')
+const inputType = ref('');
+const inputNum = ref('');
 
 const dynamicStyle = reactive({
     color: '#000',
@@ -27,50 +28,58 @@ watch(inputName, (newdata) => {
 // })
 
 
-
-
 const changeBg = (event) => {
     event.currentTarget.style.backgroundColor = 'rgba(248,199,145,0.8)';
 }
 const restoreBg = (event) => {
     event.currentTarget.style.backgroundColor = '';
 }
+
+const defaultTableArea = ref(false);
+const viewTableArea = () => {
+    defaultTableArea.value = true;
+}
+
+// GET POST DELETE PUT Patch
+const httpType = ref('');
+const changeOldData = ref('');
+const changeNewData = ref('');
+const dataList = ref([]);
+const oldDataList = ref([]);
+const newDataList = ref([]);
 const getData = () => {
-    const axiosResponse = document.querySelector('.axiosResponse')
     axios.get('http://localhost:3000/stus').then(response => {
         // 解構函數 從 response{} 中獲取 data === response.data
+        httpType.value = "檢視資料";
         const { data } = response;
-        console.log(data);
-        // 取得最新輸入的 id
-        const lastItemId = data.length;
-        // [] 中要取得最新資料 lastItemId-1
-        axiosResponse.innerHTML = `<table><tr><th>取得最新資料</th></tr> <tr><th>名稱</th><td>${response.data[lastItemId - 1].name}</td></tr> <tr><th>類別</th><td>${response.data[lastItemId - 1].type}</td></tr></table>`;
+        dataList.value = data;
     }).catch(err => {
         console.log(err);
     })
 }
 
 const postData = () => {
-    const axiosResponse = document.querySelector('.axiosResponse');
-    // post 第二個參數來傳遞 inputName 是 ref() 要用 .value 取值  
     axios.post('http://localhost:3000/stus', { name: inputName.value, type: inputType.value }).then(response => {
+        dataList.value = [];
+        httpType.value = "新增資料";
         const { data } = response;
-        console.log(data);
-        axiosResponse.innerHTML = `<table><tr><th>傳遞最新資料</th></tr> <tr><th>品名</th><td>${data.name}</td></tr> <tr><th>類別</th><td>${data.type}</td></tr></table>`;
+        dataList.value.push(data);
     }).catch(err => {
         console.log(err);
     })
 }
+
 const deleteData = () => {
     axios.get('http://localhost:3000/stus').then(response => {
         if (response.data.length > 0) {
             const deletedData = response.data[response.data.length - 1]
-            console.log(deletedData);
-            const axiosResponse = document.querySelector('.axiosResponse');
+            console.log(deletedData)
+            httpType.value = "刪除資料";
+            changeOldData.value = "被刪除資料"
             const lastDataId = response.data.length;
+
             axios.delete(`http://localhost:3000/stus/${lastDataId}`).then(response => {
-                //被刪除的資料是物件 [Object Object] 要用 .name 或 .id 來取得對應的值
-                axiosResponse.innerHTML = `<table><tr><th>被刪除的資料</th></tr> <tr><th>品名</th><td>${deletedData.name}</td></tr> <tr><th>類別</th><td>${deletedData.type}</td></tr></table>`;
+                console.log('刪除成功')
             }).catch(err => {
                 console.log('刪除失敗');
             })
@@ -85,24 +94,18 @@ const deleteData = () => {
 const putData = () => {
     axios.get('http://localhost:3000/stus').then(response => {
         if (response.data.length > 0) {
-            // 修改前最新資料
+            // 修改前資料
             const modifiedData = response.data[response.data.length - 1]
-            const axiosResponse = document.querySelector('.axiosResponse');
-            const lastModifieId = response.data.length;
-            axios.put(`http://localhost:3000/stus/${lastModifieId}`, { name: inputName.value, type: inputType.value }).then(response => {
-                if (modifiedData.name === inputName.value && modifiedData.type === inputType.value) {
-                    console.log("未修改")
-                    axiosResponse.innerHTML = `<table><tr><th>未修改</th></tr></table>`
-                } else if (modifiedData.name !== inputName.value && modifiedData.type === inputType.value) {
-                    console.log("品名修改")
-                    axiosResponse.innerHTML = `<table><tr><th>品名修改</th></tr> <tr><th>修改前品名</th><td>${modifiedData.name}</td></tr> <tr><th>修改後品名</th><td>${inputName.value}</td></tr></table>`
-                } else if (modifiedData.name === inputName.value && modifiedData.type !== inputType.value) {
-                    console.log("類別修改")
-                    axiosResponse.innerHTML = `<table><tr><th>類別修改</th></tr> <tr><th>修改前類別</th><td>${modifiedData.type}</td></tr> <tr><th>修改後類別</th><td>${inputType.value}</td></tr></table>`
-                } else {
-                    console.log("品名類別修改")
-                    axiosResponse.innerHTML = `<table><tr><th>品名類別皆修改</th></tr> <tr><th>修改前品名</th><td>${modifiedData.name}</td></tr> <tr><th>修改後品名</th><td>${inputName.value}</td></tr> <tr><th>修改前類別</th><td>${modifiedData.type}</td></tr> <tr><th>修改後類別</th><td>${inputType.value}</td></tr></table>`
-                }
+            console.log(modifiedData);
+            httpType.value = "修改資料";
+            changeOldData.value = "修改前資料"
+            changeNewData.value = "修改後資料"
+            const { data } = response;
+            oldDataList.value.push(data);
+            axios.put(`http://localhost:3000/stus/${inputNum.value}`, { name: inputName.value, type: inputType.value }).then(response => {
+                //修改後資料
+                const newData = response.data;
+                console.log(newData)
             }).catch(err => {
                 console.log('修改失敗');
             })
@@ -113,39 +116,35 @@ const putData = () => {
         }
     })
 }
-const patchData1 = () => {
+const patchDataName = () => {
     axios.get('http://localhost:3000/stus').then(response => {
         if (response.data.length > 0) {
             const modifiedData = response.data[response.data.length - 1]
             console.log(modifiedData);
             const axiosResponse = document.querySelector('.axiosResponse');
-            const lastModifieId = response.data.length;
 
-            axios.patch(`http://localhost:3000/stus/${lastModifieId}`, { name: inputName.value }).then(response => {
-                axiosResponse.innerHTML = `<table><tr><th">修改成功</th></tr> <tr><th>被修改:</th><td>${modifiedData.name}</td></tr> <tr><th>修改成:</th><td>${inputName.value}</td></tr></table>`
+            axios.patch(`http://localhost:3000/stus/${inputNum.value}`, { name: inputName.value }).then(response => {
+
             }).catch(err => {
                 console.log('修改失敗');
             })
-
         } else {
             console.log('沒有數據可修改');
         }
     })
 }
-const patchData2 = () => {
+const patchDataType = () => {
     axios.get('http://localhost:3000/stus').then(response => {
         if (response.data.length > 0) {
             const modifiedData = response.data[response.data.length - 1]
             console.log(modifiedData);
             const axiosResponse = document.querySelector('.axiosResponse');
-            const lastModifieId = response.data.length;
 
-            axios.patch(`http://localhost:3000/stus/${lastModifieId}`, { type: inputType.value }).then(response => {
-                axiosResponse.innerHTML = `<table><tr><th">修改成功</th></tr> <tr><th>被修改:</th><td>${modifiedData.type}</td></tr> <tr><th>修改成:</th><td>${inputType.value}</td></tr></table>`
+            axios.patch(`http://localhost:3000/stus/${inputNum.value}`, { type: inputType.value }).then(response => {
+
             }).catch(err => {
                 console.log('修改失敗');
             })
-
         } else {
             console.log('沒有數據可修改');
         }
@@ -181,27 +180,53 @@ const patchData2 = () => {
                     <span :style="dynamicStyle">{{ inputType }}</span>
                 </div>
             </div>
+            <div class="numBox">
+                <input type="number" v-model="inputNum" style="background-color: aliceblue; color: black;"
+                    placeholder="請輸入編號">
+            </div>
+
         </div>
 
-        <div class="nav">
+        <div class="nav" @click="viewTableArea">
             <ul>
-                <li><a href="#" @click.prevent class="Alpha" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="getData">GET</a></li>
-                <li><a href="#" @click.prevent class="Beta" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="postData">POST</a></li>
-                <li><a href="#" @click.prevent class="Gamma" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="deleteData">DELETE</a></li>
-                <li><a href="#" @click.prevent class="Delta" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="putData">PUT</a></li>
-                <li><a href="#" @click.prevent class="Epslion" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="patchData1">PATCH name</a>
+                <li><a href="#" @click.prevent class="httpGet" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="getData">檢視</a></li>
+                <li><a href="#" @click.prevent class="httpPost" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="postData">新增</a></li>
+                <li><a href="#" @click.prevent class="httpDelete" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="deleteData">刪除</a></li>
+                <li><a href="#" @click.prevent class="httpPut" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="putData">修改</a></li>
+                <li><a href="#" @click.prevent class="httpPatchName" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="patchDataName">修改名稱</a>
                 </li>
-                <li><a href="#" @click.prevent class="Zeta" @mouseover="changeBg" @mouseleave="restoreBg"
-                        @click="patchData2">PATCH Type</a>
+                <li><a href="#" @click.prevent class="httpPatchType" @mouseover="changeBg" @mouseleave="restoreBg"
+                        @click="patchDataType">修改類別</a>
                 </li>
             </ul>
         </div>
-        <div class="axiosResponse" style="display: flex; justify-content: center; align-items: center; height: 30vh;"></div>
+
+        <div class="axiosResponse">
+            <table class="alphaTable">
+                <thead>
+                    <h2 :class="httpType">{{ httpType }}</h2>
+                    <tr v-show="defaultTableArea">
+                        <th></th>
+                        <th>品名</th>
+                        <th>類別</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(data, index) in dataList" :key="index">
+                        <th class="tableIndex">{{ data.id }}</th>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.type }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
         <div class="slidebox">
             <img src="../assets/9.png" alt="caption">
             <div class="caption">
@@ -288,7 +313,7 @@ ul {
 .nav li a {
     display: inline-block;
     position: relative;
-    color: #0c89e1;
+    color: #0c68e1e2;
     text-decoration: none;
     font-weight: 600;
     padding: 8px 16px;
@@ -297,8 +322,40 @@ ul {
 }
 
 .axiosResponse {
-    height: 10vh;
+    margin: 3vh 0;
+    max-height: 25vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 30vh;
 }
+
+.axiosResponse table {
+    width: 70vh;
+}
+
+table {
+    width: 50vh;
+    border-collapse: collapse;
+    /* border: 1px solid #312d23; */
+    text-align: left;
+}
+
+
+table thead tr {
+    background-color: #1ca88cd8;
+    color: #210538;
+}
+
+
+table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+table .tableIndex {
+    text-align: center;
+}
+
 
 .slidebox {
     height: 30vh;
