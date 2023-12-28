@@ -45,8 +45,6 @@ const httpType = ref('');
 const changeOldData = ref('');
 const changeNewData = ref('');
 const dataList = ref([]);
-const oldDataList = ref([]);
-const newDataList = ref([]);
 const getData = () => {
     axios.get('http://localhost:3000/stus').then(response => {
         // 解構函數 從 response{} 中獲取 data === response.data
@@ -101,11 +99,10 @@ const putData = () => {
             changeOldData.value = "修改前資料"
             changeNewData.value = "修改後資料"
             const { data } = response;
-            oldDataList.value.push(data);
+            // console.log(data)
             axios.put(`http://localhost:3000/stus/${inputNum.value}`, { name: inputName.value, type: inputType.value }).then(response => {
                 //修改後資料
-                const newData = response.data;
-                console.log(newData)
+                console.log(response.data)
             }).catch(err => {
                 console.log('修改失敗');
             })
@@ -224,8 +221,8 @@ const patchDataType = () => {
                     </tr>
                 </tbody>
             </table>
-
         </div>
+
 
         <div class="slidebox">
             <img src="../assets/9.png" alt="caption">

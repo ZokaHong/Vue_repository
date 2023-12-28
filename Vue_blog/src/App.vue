@@ -7,5 +7,5 @@ import BlogPost3 from './Component/BlogPost3.vue';
 <template>
     <BlogPost1></BlogPost1>
     <BlogPost2></BlogPost2>
-    <!-- <BlogPost3></BlogPost3> -->
+    <BlogPost3></BlogPost3>
 </template>
