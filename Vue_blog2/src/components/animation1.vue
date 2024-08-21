@@ -9,13 +9,12 @@ import { EffectCube, EffectFlip, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/bundle';
 
-
 const photos = [
-  "0363.png",
-  "0135.png",
-  "0172.png",
-  "0872.png",
-  "0961.png"
+  {icon:"0363.png",title:"0363"},
+  {icon:"0135.png",title:"0135"},
+  {icon:"0172.png",title:"0172"},
+  {icon:"0872.png",title:"0872"},
+  {icon:"0961.png",title:"0961"}
 ]
 
 const activeTab = ref('全部');
@@ -26,7 +25,9 @@ const onActive = (tab) => {
 
 </script>
 
+
 <template>
+  <div class="item-box"></div>
   <header id="header" class="header">
     <div class="header-content left">
       <div class="header-logo">
@@ -37,21 +38,20 @@ const onActive = (tab) => {
       </div>
     </div>
     <div class="header-content right">
-      <a class="header-button" href="">
+      <a class="header-button" href="#spheal">
         <span>登入</span>
       </a>
       <span>
         <a id="headerMenuButton">
-          <font-awesome-icon :icon="['fas', 'bars']" size="2xl" style="color: #fff;" />
+          <font-awesome-icon :icon="['fas', 'bars']" size="2xl" style="color: #ffffff;" />
         </a>
       </span>
     </div>
   </header>
 
-
   <div class="container my-4">
-    <div class="row g-2 mb-4 border border-4 border-success rounded-2">
-      <div class="col-12 col-md-7">
+    <div class="row g-0 mb-4 border border-4 border-success rounded-2">
+      <div class="col-12 col-md-6">
         <div class="p-3 border bg-light top-banner">
           <!-- <swiper>
          <SwiperSlide>
@@ -62,9 +62,16 @@ const onActive = (tab) => {
             :autoplay="{ autoplay: true, delay: 3000, pauseOnMouseEnter: true }" grab-cursor>
             <!-- pauseOnMouseEnter滑鼠移入暫停撥放 -->
             <SwiperSlide v-for="photo in photos" :key="photo">
-              <img :src="`src/assets/${photo}`" alt="">
+              <img :src="`src/assets/${photo.icon}`" :alt="`${photo.title}`" :title="`${photo.title}`">
             </SwiperSlide>
           </swiper>
+        </div>
+      </div>
+      <div class="col-12 col-md-1">
+        <div class="p-1 bg-light slide-texts">
+          <div class="slide-text">
+            Welcome
+          </div>
         </div>
       </div>
       <div class="col-12 col-md-5">
@@ -73,7 +80,7 @@ const onActive = (tab) => {
             <div class="schedule-header">
               <span class="schedule-header-title">schedule</span>
               <div class="schedule-header-search">
-                <input class="schedule-header-input" type="text" placeholder="Search">
+                <input class="schedule-header-input" id="searchInput" type="text" placeholder="Search">
                 <a class="schedule-header-button" href="">
                   <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="xl" />
                 </a>
@@ -89,7 +96,7 @@ const onActive = (tab) => {
                 <li class="schedule-tab-item" :class="{ 'active': activeTab === '其他公告' }" @click="onActive('其他公告')">其他公告
                 </li>
               </ul>
-              <div class="schedule-list">
+              <div class="schedule-list scrollbar">
                 <div class="schedule-list-item">
                   <a class="schedule-list-link" href="">
                     <div class="schedule-list-icon">
@@ -170,7 +177,7 @@ const onActive = (tab) => {
 
 
   <article>
-    <button class="button">spheal</button>
+    <button id="spheal" class="button">spheal</button>
     <p>
       Spheal is much faster rolling than walking to get around. When groups of this Pokémon eat, they all clap at once to
       show their pleasure. Because of this, their mealtimes are noisy.
@@ -179,27 +186,16 @@ const onActive = (tab) => {
 </template>
 
 <style>
-.swiper {
-  width: 100%;
-  height: 100%;
-}
-
-.swiper-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-
 
 .header {
   height: 10vh;
   display: flex;
-  background-color: rgba(45, 45, 45, 0.2);
+  background-color: rgba(80, 180, 190, 0.6);
   border-bottom: 1px solid rgba(0, 0, 0, 0.6);
   position: sticky;
   top: 0;
   z-index: 99;
+  position: relative;
 }
 
 .header-content {
@@ -287,6 +283,61 @@ const onActive = (tab) => {
   height: 28rem;
 }
 
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.slide-texts {
+  height: 28rem;
+  overflow: hidden;
+}
+
+.slide-text {
+  writing-mode: vertical-lr;
+  font: 700 4.8rem '';
+  line-height: 5rem;
+  animation: slideVertical 7s linear 0.5s infinite both;
+}
+
+@media screen and (max-width:768px) {
+  .slide-texts {
+    height: 3rem;
+  }
+
+  .slide-text { 
+    writing-mode: horizontal-tb;
+    font: 300 1.8rem '';
+    line-height: 2.5rem;
+    animation: slideHorizontal 6s linear 0.5s infinite both;
+  }
+}
+
+@keyframes slideVertical {
+  0%{
+    translate: 0 30rem;
+  }
+  100%{
+    translate: 0 -30rem;
+
+  }
+}
+
+@keyframes slideHorizontal {
+  0%{
+    translate: 20rem 0;
+  }
+  100%{
+    translate: -20rem 0;
+  }
+}
+
 .schedule {
   height: 100%;
 }
@@ -309,8 +360,7 @@ const onActive = (tab) => {
 
 .schedule-header-title::before {
   content: '';
-  width: 5px;
-  height: 2rem;
+  width: 0.4rem;
   background-color: #3be219;
   margin: 0 0.6rem 0 0;
 }
@@ -318,7 +368,8 @@ const onActive = (tab) => {
 .schedule-header-search {
   margin: 0 0 0 auto;
 }
-.schedule-header-button{
+
+.schedule-header-button {
   margin: 0 0.5rem 0 1rem;
 }
 
@@ -361,6 +412,7 @@ const onActive = (tab) => {
 .schedule-list-link {
   display: flex;
   padding: 1rem;
+  align-items: center;
 }
 
 .schedule-list-item .schedule-list-icon {
@@ -371,7 +423,7 @@ const onActive = (tab) => {
 .schedule-list-item .schedule-list-icon img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .schedule-list-detail {
@@ -385,14 +437,41 @@ const onActive = (tab) => {
 .schedule-list-detail:hover {
   color: #000;
 }
-.schedule-list-type{
+
+.schedule-list-type {
   border: #3be219 solid 1px;
   color: #3be219;
+}
+
+.schedule-list-date {
+  margin-left: 1rem;
 }
 
 .schedule-list-title {
   width: 100%;
   text-decoration: underline;
+  margin-top: 0.6rem;
+}
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 18px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #333333;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #12922d;
+    border-radius: 10px;
+    border: 5px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #f809e4;
+  }
 }
 
 
