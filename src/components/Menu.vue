@@ -89,12 +89,12 @@ const searchEvent = () => {
       console.log(error);
       alert("查詢失敗");
     });
-    setTimeout(()=>{
-      window.scrollTo({
-          top: 400,
-          behavior: 'smooth'
-        });
-    },1000)
+  setTimeout(() => {
+    window.scrollTo({
+      top: 400,
+      behavior: "smooth",
+    });
+  }, 1000);
 };
 
 import { useRouter } from "vue-router";
@@ -160,7 +160,7 @@ const isManager = ref(false);
               <el-input
                 type="text"
                 v-model="searchInput"
-                style="width: 60%;height:35px;font-size: 20px;"
+                style="width: 60%; height: 35px; font-size: 20px"
                 placeholder="Search"
               />
               <el-button class="search-button" text @click="searchEvent">
@@ -168,14 +168,16 @@ const isManager = ref(false);
               </el-button>
             </el-col>
 
-            <el-col :span="6">
+            <el-col :span="4" :offset="2">
               <el-button
+                class="userButton"
                 text
                 v-show="permissions === 0"
                 @click="routerToPage('user')"
                 >使用者</el-button
               >
               <el-button
+                class="managerButton"
                 text
                 v-show="permissions === 1"
                 @click="routerToPage('manage')"
@@ -202,7 +204,9 @@ const isManager = ref(false);
                 text
                 @click="routerToPage('shoppingCart')"
               >
-                <el-icon size="25px" style="color: rgba(0, 0, 0, 0.6);"><ShoppingCart /></el-icon>
+                <el-icon size="25px" style="color: rgba(0, 0, 0, 0.6)"
+                  ><ShoppingCart
+                /></el-icon>
               </el-button>
             </el-col>
             <!-- <el-col :span="5">
@@ -293,7 +297,7 @@ const isManager = ref(false);
 .el-header {
   width: 100%;
   height: 100%;
-  background-color: rgba(235, 129, 103, 0.8);
+  background-color: rgba(234, 179, 165, 0.8);
   box-shadow: 0 0 0 2px #000;
 }
 
@@ -315,9 +319,9 @@ const isManager = ref(false);
   justify-content: start;
   align-items: center;
 }
-.bibiQ-title{
-  font: 600 26px '';
-  user-select: none
+.bibiQ-title {
+  font: 600 28px "";
+  user-select: none;
 }
 .nav-box {
   align-items: center;
@@ -331,25 +335,39 @@ const isManager = ref(false);
   width: 25px;
   height: 25px;
   padding: 5px;
-  transition: .5s;
+  transition: 0.5s;
 }
 .search-button:hover {
   background-color: #000000;
 }
-
-.loginButton,
-.logoutButton {
-  width: 60%;
-  font: 600 20px "";
+.userButton,
+.managerButton {
+  width: 50%;
+  font: 600 18px "";
   color: rgba(0, 0, 0, 0.6);
   background-color: rgba(245, 245, 245, 0.8) !important;
   box-shadow: 0 0 0 2px #000;
-  transition: 0.5s;
+  transition: 0.3s;
+}
+.userButton:hover,
+.managerButton:hover {
+  color: rgb(245, 245, 245);
+  background-color: rgba(63, 169, 235, 0.8) !important;
+}
+
+.loginButton,
+.logoutButton {
+  width: 50%;
+  font: 600 18px "";
+  color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(245, 245, 245, 0.8) !important;
+  box-shadow: 0 0 0 2px #000;
+  transition: 0.3s;
 }
 .loginButton:hover,
 .logoutButton:hover {
   color: rgb(245, 245, 245);
-  background-color: rgba(235, 63, 106, 0.8) !important;
+  background-color: rgba(225, 80, 107, 0.8) !important;
 }
 .shoppingCartButton {
   box-sizing: content-box;
@@ -393,9 +411,13 @@ const isManager = ref(false);
 .confirmButtonClass {
   color: #000 !important;
   background-color: #8bc5c5 !important;
+  font: 700 16px Helvetica;
+  border: #000 1px inset;
 }
 .cancelButtonClass {
   color: #000 !important;
   background-color: #fff !important;
+  font: 700 16px Helvetica;
+  border: #000 1px inset;
 }
 </style>
